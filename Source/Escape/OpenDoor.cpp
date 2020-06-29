@@ -22,6 +22,12 @@ void UOpenDoor::BeginPlay()
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
 	TargetYaw = InitialYaw + 90.f;
+
+	//if no pressure plate set, display the error message and the actor name
+	if(!PressurePlate)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s has the open door component attched but no pressureplate property set!"), *GetOwner()->GetName());
+	}
 }
 
 
@@ -29,11 +35,19 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Yaw is %f"), GetOwner()->GetActorRotation().Yaw);
-	CurrentYaw = GetOwner()->GetActorRotation().Yaw;
-	FRotator OpenDoor(0.f,CurrentYaw,0.f);
-	OpenDoor.Yaw = FMath::Lerp(CurrentYaw, TargetYaw, 0.02f);
-	GetOwner()->SetActorRotation(OpenDoor);
+	//ActorThatOpensDoor set to Default pawn
+	//If pressure plate property not set, it won't call pressureplate's IsOverlappingActor to avoid nullptr crash
+	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
+	{
+		OpenDoor(DeltaTime);
+	}
 }
 
+void UOpenDoor::OpenDoor(float DeltaTime)
+{
+	// UE_LOG(LogTemp, Warning, TEXT("Yaw is %f"), GetOwner()->GetActorRotation().Yaw);
+	CurrentYaw = GetOwner()->GetActorRotation().Yaw;
+	FRotator OpenDoor(0.f,CurrentYaw,0.f);
+	OpenDoor.Yaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * 0.8f);
+	GetOwner()->SetActorRotation(OpenDoor);
+}
