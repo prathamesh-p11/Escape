@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"	
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
 
@@ -28,6 +29,9 @@ void UOpenDoor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s has the open door component attched but no pressureplate property set!"), *GetOwner()->GetName());
 	}
+
+	//returns default pawn
+	ActorThatOpensDoor = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 
@@ -41,6 +45,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		OpenDoor(DeltaTime);
 	}
+	else if(PressurePlate && !PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
+	{
+		CloseDoor(DeltaTime);
+	}
 }
 
 void UOpenDoor::OpenDoor(float DeltaTime)
@@ -50,4 +58,12 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 	FRotator OpenDoor(0.f,CurrentYaw,0.f);
 	OpenDoor.Yaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * 0.8f);
 	GetOwner()->SetActorRotation(OpenDoor);
+}
+
+void UOpenDoor::CloseDoor(float DeltaTime)
+{
+	CurrentYaw = GetOwner()->GetActorRotation().Yaw;
+	FRotator CloseDoor(0.f,CurrentYaw,0.f);
+	CloseDoor.Yaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * 1.f);
+	GetOwner()->SetActorRotation(CloseDoor);
 }
