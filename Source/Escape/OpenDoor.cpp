@@ -22,7 +22,7 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
-	TargetYaw = InitialYaw + 90.f;
+	OpenAngle = InitialYaw + 90.f;
 
 	//if no pressure plate set, display the error message and the actor name
 	if(!PressurePlate)
@@ -44,10 +44,13 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
 	{
 		OpenDoor(DeltaTime);
+		//returns time from when world was created!!!
+		DoorOpenedAt = GetWorld()->GetTimeSeconds();
 	}
 	else if(PressurePlate && !PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
 	{
-		CloseDoor(DeltaTime);
+		if(GetWorld()->GetTimeSeconds() - DoorOpenedAt > DoorCloseDelay)
+			CloseDoor(DeltaTime);
 	}
 }
 
@@ -56,7 +59,7 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 	// UE_LOG(LogTemp, Warning, TEXT("Yaw is %f"), GetOwner()->GetActorRotation().Yaw);
 	CurrentYaw = GetOwner()->GetActorRotation().Yaw;
 	FRotator OpenDoor(0.f,CurrentYaw,0.f);
-	OpenDoor.Yaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * 0.8f);
+	OpenDoor.Yaw = FMath::Lerp(CurrentYaw, OpenAngle, DeltaTime * DoorOpenSpeed);
 	GetOwner()->SetActorRotation(OpenDoor);
 }
 
@@ -64,6 +67,6 @@ void UOpenDoor::CloseDoor(float DeltaTime)
 {
 	CurrentYaw = GetOwner()->GetActorRotation().Yaw;
 	FRotator CloseDoor(0.f,CurrentYaw,0.f);
-	CloseDoor.Yaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * 1.f);
+	CloseDoor.Yaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * DoorCloseSpeed);
 	GetOwner()->SetActorRotation(CloseDoor);
 }
