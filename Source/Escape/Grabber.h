@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Grabber.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ESCAPE_API UGrabber : public UActorComponent
@@ -25,5 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	static constexpr float Reach  = 100.f; 
+	static constexpr float Reach  = 150.f;
+	UPhysicsHandleComponent* PhysicsHandle = nullptr;	//utility object for moving physics objects around
+	UInputComponent* InputComponent = nullptr;
+	void Grab();
 };
