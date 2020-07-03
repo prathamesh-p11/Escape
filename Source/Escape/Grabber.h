@@ -35,4 +35,8 @@ private:
 
 	//Get the first AActor withing reach with physics body
 	FHitResult GetFirstObjectInReach() const; 
+
+	//Return line trace end
+	FVector GetPlayerReach() const;
+	FVector GetPlayerLocation() const;
 };
