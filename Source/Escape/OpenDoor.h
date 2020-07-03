@@ -16,15 +16,15 @@ class ESCAPE_API UOpenDoor : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UOpenDoor();
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void OpenDoor(float DeltaTime);
+	void CloseDoor(float DeltaTime);
+	float TotalMassOfActors() const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	void OpenDoor(float DeltaTime);
-	void CloseDoor(float DeltaTime);
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	float OpenAngle;
@@ -43,4 +43,6 @@ private:
 
 	float DoorOpenSpeed = 0.8f;
 	float DoorCloseSpeed = 2.f;
+
+	float MinMassToOpenDoor = 50.f;
 };

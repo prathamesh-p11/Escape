@@ -103,18 +103,18 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 FHitResult UGrabber::GetFirstObjectInReach() const
 {
 	//Draw a line from player to show reach
-	/* Debug code
-	DrawDebugLine(
-		GetWorld(),		//world
-		PlayerViewPointLocation,		//starting point
-		LineTraceEnd,					//end point
-		FColor(0, 255, 0),				//color of line
-		false,							//does line persists? false - we want to update the line every tick
-		0.f,							//lifetime - no persistence - no life - 0
-		0,								//Depthpriority
-		5								//line thickness
-	);
-	*/
+	//Debug code
+	// DrawDebugLine(
+	// 	GetWorld(),		//world
+	// 	GetPlayerLocation(),		//starting point
+	// 	GetPlayerReach(),					//end point
+	// 	FColor(0, 255, 0),				//color of line
+	// 	false,							//does line persists? false - we want to update the line every tick
+	// 	0.f,							//lifetime - no persistence - no life - 0
+	// 	0,								//Depthpriority
+	// 	5								//line thickness
+	// );
+	
 	//Reach out from player(RayCasting) to a certain distance
 	FHitResult ObjectHit;
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());	//FCollisionQueryParams(TraceTag, bTraceComplex, IgnoreActor)
