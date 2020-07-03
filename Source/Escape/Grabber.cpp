@@ -140,6 +140,5 @@ FHitResult UGrabber::GetFirstObjectInReach() const
 	// if(ActorHit)
 	// 	UE_LOG(LogTemp, Warning, TEXT("Line trace has hit %s"), *(ActorHit->GetName()));
 	//What objects rays are hitting and are they grabable
-
 	return ObjectHit; 
 }
