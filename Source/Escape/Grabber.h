@@ -23,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	static constexpr float Reach  = 200.f;
+	static constexpr float Reach  = 150.f;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;	//utility object for moving physics objects around
 	UInputComponent* InputComponent = nullptr;
 

@@ -48,12 +48,37 @@ void UGrabber::SetupInputComponent()
 
 void UGrabber::Grab()
 {
+	//TODO : Clean code by either passing LineTraceEnd or by making it a class variable
+	//Just for Line trace end
+	//---------------Unnecessary redundant copy-----------------------------------------------
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerViewPointLocation, OUT PlayerViewPointRotation);	
+
+	FVector LineTraceEndRotation = PlayerViewPointRotation.Vector();
+	FVector LineTraceEnd = PlayerViewPointLocation + (LineTraceEndRotation * Reach);
+	//---------------Unnecessary redundant copy-----------------------------------------------
+	
+
 		UE_LOG(LogTemp, Warning, TEXT("***GRAB***"));
-		GetFirstObjectInReach();
+		FHitResult HitResult = GetFirstObjectInReach();
+		UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+		//GrabComponentAtLocation(Component, BoneName, GrabLocation)
+		//GrabLocation = Where to grab the component = set to object's origin
+		if(HitResult.GetActor())
+		{
+			PhysicsHandle->GrabComponentAtLocation(
+				ComponentToGrab,
+				NAME_None,
+				LineTraceEnd
+			);
+		}
 }
 
 void UGrabber::Drop()
 {
+		PhysicsHandle->ReleaseComponent();
+
 		UE_LOG(LogTemp, Warning, TEXT("***DROPPED***"));
 }
 
@@ -62,6 +87,23 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+		//TODO : Clean code by either passing LineTraceEnd or by making it a class variable
+	//Just for Line trace end
+	//---------------Unnecessary redundant copy-----------------------------------------------
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerViewPointLocation, OUT PlayerViewPointRotation);	
+
+	FVector LineTraceEndRotation = PlayerViewPointRotation.Vector();
+	FVector LineTraceEnd = PlayerViewPointLocation + (LineTraceEndRotation * Reach);
+	//---------------Unnecessary redundant copy-----------------------------------------------
+
+
+	//If physics handle is attached
+	if(PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 }
 
 FHitResult UGrabber::GetFirstObjectInReach() const
@@ -89,8 +131,16 @@ FHitResult UGrabber::GetFirstObjectInReach() const
 	*/
 	//Reach out from player(RayCasting) to a certain distance
 	FHitResult ObjectHit;
-	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
-
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());	//FCollisionQueryParams(TraceTag, bTraceComplex, IgnoreActor)
+	//Trace tag = Tag used to provide extra information or filtering for debugging of the trace 
+	//TraceComplex = whether to trace against complex collision
+	//Actors to ignore - self passed since the trace line's origin begins from inside the actor 
+	
+	//Outhit = First blocking hit found
+	//Start = PlayerViewPointLocation(start location of ray)
+	//End = LineTraceEnd(end location of ray)
+	//ObjectQueryParams = List of object types it's looking for
+	//Params	Additional parameters used for the trace
 	GetWorld()->LineTraceSingleByObjectType(
 		OUT ObjectHit,
 		PlayerViewPointLocation,
