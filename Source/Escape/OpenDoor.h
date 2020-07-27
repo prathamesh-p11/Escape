@@ -21,6 +21,7 @@ public:
 	void OpenDoor(float DeltaTime);
 	void CloseDoor(float DeltaTime);
 	float TotalMassOfActors() const;
+	void FindAudioComponent();
 
 protected:
 	// Called when the game starts
@@ -34,9 +35,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
 
-	//Property to select actor which would trigger the pressure plate (manually set to default pawn every time in UE editor Open Door component)
-	UPROPERTY(EditAnywhere)
-	AActor* ActorThatOpensDoor; 
+	UPROPERTY()
+	UAudioComponent* DoorAudioComponent;
 
 	float DoorOpenedAt = 0.f;
 	constexpr static float DoorCloseDelay = 0.5f;
@@ -45,4 +45,7 @@ private:
 	float DoorCloseSpeed = 2.f;
 
 	float MinMassToOpenDoor = 50.f;
+
+	bool OpenDoorSound = false;
+	bool CloseDoorSound = true;
 };

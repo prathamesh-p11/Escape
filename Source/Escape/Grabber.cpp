@@ -29,10 +29,8 @@ void UGrabber::BeginPlay()
 void UGrabber::FindPhysicsHandle()
 {
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if(PhysicsHandle == nullptr)
-	{
+	if(!PhysicsHandle)
 		UE_LOG(LogTemp, Error, TEXT("No physics handle conponent found on %s"), *GetOwner()->GetName());
-	}
 }
 
 //Input Component Setup and binding
@@ -53,8 +51,11 @@ void UGrabber::Grab()
 		UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
 		//GrabComponentAtLocation(Component, BoneName, GrabLocation)
 		//GrabLocation = Where to grab the component = set to object's origin
-		if(HitResult.GetActor())
+		AActor* ActorHit = HitResult.GetActor();
+		if(ActorHit)
 		{
+			if(!PhysicsHandle)
+				return;
 			PhysicsHandle->GrabComponentAtLocation(
 				ComponentToGrab,
 				NAME_None,
@@ -84,8 +85,10 @@ FVector UGrabber::GetPlayerReach() const
 
 void UGrabber::Drop()
 {
-		PhysicsHandle->ReleaseComponent();
-		//UE_LOG(LogTemp, Warning, TEXT("***DROPPED***"));
+	if(!PhysicsHandle)
+		return;
+	PhysicsHandle->ReleaseComponent();
+	//UE_LOG(LogTemp, Warning, TEXT("***DROPPED***"));
 }
 
 // Called every frame
@@ -93,6 +96,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(!PhysicsHandle)
+		return;
 	//If physics handle is attached
 	if(PhysicsHandle->GrabbedComponent)
 	{
